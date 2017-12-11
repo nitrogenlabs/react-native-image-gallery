@@ -1,0 +1,121 @@
+{
+  "name": "@nlabs/react-native-image-gallery",
+  "version": "1.0.0",
+  "description": "A React Native image gallery browser with interactive animations",
+  "license": "MIT",
+  "main": "index.js",
+  "keywords": [
+    "gallery",
+    "image",
+    "nitrogenlabs",
+    "react-native"
+  ],
+  "author": "Alvaro Medina Ballester",
+  "contributors": [
+    "Giraldo Rosales <giraldo@nitrogenlabs.com> (http://nitrogenlabs.com/)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nitrogenlabs/react-native-image-gallery"
+  },
+  "homepage": "http://nitrogenlabs.com",
+  "bugs": {
+    "url": "https://github.com/nitrogenlabs/react-native-image-gallery/issues"
+  },
+  "scripts": {
+    "compile": "NODE_ENV=production tsc",
+    "docs": "typedoc --target ES5 --module commonjs --out docs/ src/ --exclude src/index.ts --excludeExternals --hideGenerator",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
+    "prepublishOnly": "NODE_ENV=production npm test && npm run compile",
+    "pretest": "npm run lint",
+    "test": "jest",
+    "watch": "tsc -w -p ./src"
+  },
+  "typings": "dist/index",
+  "dependencies": {
+    "react-native-vector-icons": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/babel-core": "^6.25.3",
+    "@types/jest": "^21.1.8",
+    "@types/prop-types": "^15.5.2",
+    "@types/react": "^16.0.28",
+    "@types/react-native": "^0.51.0",
+    "@types/react-test-renderer": "^16.0.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react-native": "^4.0.0",
+    "jest": "^21.2.1",
+    "prop-types": "^15.6.0",
+    "react": "^16.2.0",
+    "react-native": "^0.51.0",
+    "react-test-renderer": "^16.2.0",
+    "ts-jest": "^21.2.4",
+    "tslint": "^5.8.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "tslint-react": "^3.2.0",
+    "typedoc": "^0.9.0",
+    "typescript": "^2.6.2"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-native": ">=0.50"
+  },
+  "jest": {
+    "automock": false,
+    "bail": false,
+    "browser": false,
+    "globals": {
+      "__DEV__": true
+    },
+    "haste": {
+      "defaultPlatform": "ios",
+      "platforms": [
+        "android",
+        "ios"
+      ],
+      "providesModuleNodeModules": [
+        "react-native"
+      ]
+    },
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "ts",
+      "tsx",
+      "json"
+    ],
+    "moduleNameMapper": {
+      "^[./a-zA-Z0-9$_-]+\\.(bmp|gif|jpg|jpeg|png|psd|svg|webp|ttf|otf)$": "RelativeImageStub",
+      "^React$": "<rootDir>/node_modules/react"
+    },
+    "modulePathIgnorePatterns": [
+      "<rootDir>/node_modules/react-native/Libraries/react-native/",
+      "<rootDir>/node_modules/react-native/packager/"
+    ],
+    "setupFiles": [
+      "<rootDir>/node_modules/react-native/jest/setup.js",
+      "<rootDir>/jest.setup.js"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/src/**/*test.ts?(x)"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/?!(react-native)"
+    ],
+    "unmockedModulePathPatterns": [
+      "promise",
+      "source-map",
+      "<rootDir>/node_modules/react-native/"
+    ],
+    "verbose": false
+  }
+}
