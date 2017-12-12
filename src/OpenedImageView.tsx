@@ -20,9 +20,6 @@ export interface OpenedImageViewState {
 }
 
 export class OpenedImageView extends React.PureComponent<OpenedImageViewProps, OpenedImageViewState> {
-  private imageRef;
-  state: OpenedImageViewState;
-
   static propTypes: object = {
     height: PropTypes.number.isRequired,
     imageHeight: PropTypes.number.isRequired,
@@ -63,18 +60,12 @@ export class OpenedImageView extends React.PureComponent<OpenedImageViewProps, O
       alignItems: 'center',
       flexDirection: 'row',
       height: containerHeight,
-      opacity: transitionProgress.interpolate({
-        inputRange: [0.998, 0.999],
-        outputRange: [0, 1]
-      }),
+      opacity: transitionProgress.interpolate({inputRange: [0.998, 0.999], outputRange: [0, 1]}),
       width: containerWidth
     };
     const imageStyle: ImageStyle = {
       height: imageHeight,
-      opacity: transitionProgress.interpolate({
-        inputRange: [0.998, 0.999],
-        outputRange: [0, 1]
-      }),
+      opacity: transitionProgress.interpolate({inputRange: [0.998, 0.999], outputRange: [0, 1]}),
       width: imageWidth
     };
 
@@ -82,7 +73,6 @@ export class OpenedImageView extends React.PureComponent<OpenedImageViewProps, O
       <Animated.View style={containerStyle}>
         <TouchableWithoutFeedback onPress={this.onPressImage}>
           <Animated.Image
-            ref={(r) => this.imageRef = r}
             source={{uri: url}}
             resizeMode="contain"
             style={imageStyle} />

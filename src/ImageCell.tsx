@@ -5,13 +5,13 @@ import {Animated, Dimensions, Easing, Image, ImageURISource, TouchableOpacity} f
 const windowWidth: number = Dimensions.get('window').width * 0.5;
 
 export interface ImageCellProps {
-  readonly imageColor: string;
   readonly imageHeight: number;
   readonly imageId: string;
   readonly imageWidth: number;
   readonly source: ImageURISource;
   readonly onPress: (imageId: string) => void;
   readonly shouldHideDisplayedImage: boolean;
+  readonly theme?: any;
   readonly topMargin: number;
 }
 
@@ -25,20 +25,20 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
   private readyToMeasure: boolean = false;
 
   static propTypes: object = {
-    imageColor: PropTypes.string,
     imageHeight: PropTypes.number,
     imageId: PropTypes.string.isRequired,
     imageWidth: PropTypes.number,
     onPress: PropTypes.func.isRequired,
     shouldHideDisplayedImage: PropTypes.bool.isRequired,
     source: PropTypes.any.isRequired,
+    theme: PropTypes.object,
     topMargin: PropTypes.number.isRequired
   };
 
   static defaultProps: object = {
-    imageColor: 'lightgrey',
     imageHeight: windowWidth,
-    imageWidth: windowWidth
+    imageWidth: windowWidth,
+    theme: {}
   };
 
   static contextTypes = {
@@ -156,14 +156,15 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
 
   render(): JSX.Element {
     const {
-      imageColor,
       imageHeight,
       imageId,
       imageWidth,
-      source
+      source,
+      theme
     } = this.props;
+    const {imageGalleryImageColor = '#f1f1f1'} = theme;
     const imageStyle = {
-      backgroundColor: imageColor,
+      backgroundColor: imageGalleryImageColor,
       height: imageHeight,
       opacity: this.state.opacity,
       width: imageWidth
@@ -172,7 +173,7 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
     return (
       <TouchableOpacity
         key={imageId}
-        style={{backgroundColor: imageColor}}
+        style={{backgroundColor: imageGalleryImageColor}}
         onPress={this.onPress}>
         <Animated.Image
           onLayout={() => this.readyToMeasure = true}

@@ -7,19 +7,18 @@ import {ImageGallerySource} from './types/image';
 
 export interface ImageListContainerProps {
   readonly activeId?: string;
-  readonly imageColor?: string;
   readonly imageHeight?: number;
   readonly imageWidth?: number;
   readonly images?: ImageGallerySource[];
   readonly onPress?: (imageId: string) => void;
   readonly showImageViewer?: boolean;
+  readonly theme?: object;
   readonly topMargin?: number;
 }
 
 export class ImageListContainer extends React.PureComponent<ImageListContainerProps> {
   static propTypes = {
     activeId: PropTypes.string,
-    imageColor: PropTypes.string,
     imageHeight: PropTypes.number,
     imageWidth: PropTypes.number,
     images: PropTypes.arrayOf(
@@ -30,12 +29,14 @@ export class ImageListContainer extends React.PureComponent<ImageListContainerPr
     ),
     onPress: PropTypes.func.isRequired,
     showImageViewer: PropTypes.bool,
+    theme: PropTypes.object,
     topMargin: PropTypes.number
   };
 
   static defaultProps: object = {
     images: [],
     showImageViewer: false,
+    theme: {},
     topMargin: 0
   };
 
@@ -49,24 +50,24 @@ export class ImageListContainer extends React.PureComponent<ImageListContainerPr
   renderItem(item: {item: ImageGallerySource, index: number}): JSX.Element {
     const {
       activeId,
-      imageColor,
       imageHeight,
       imageWidth,
       onPress,
       showImageViewer,
+      theme,
       topMargin
     } = this.props;
 
     return (
       <ImageCell
         key={`ImageCellId-${item.item.id}`}
-        imageColor={imageColor}
         imageHeight={imageHeight}
         imageId={item.item.id}
         imageWidth={imageWidth}
         source={{uri: item.item.url}}
         onPress={onPress}
         shouldHideDisplayedImage={showImageViewer && activeId === item.item.id}
+        theme={theme}
         topMargin={topMargin} />
     );
   }

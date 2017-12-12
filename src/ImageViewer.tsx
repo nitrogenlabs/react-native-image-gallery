@@ -1,3 +1,4 @@
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import {Animated, Dimensions, Easing, Platform, StyleSheet, ViewStyle} from 'react-native';
 
@@ -15,14 +16,14 @@ import {Utils} from './Utils';
 import {ViewerBackground} from './ViewerBackground';
 
 export interface ImageViewerProps {
-  readonly images: ImageGallerySource[];
-  readonly imageId: string;
-  readonly onClose: () => void;
-  readonly onChange: (imageId: string) => void;
   readonly getSourceContext: (imageId: string) => ImageGalleryMeasureFunctions;
-  readonly infoTitleStyles?: ViewStyle;
+  readonly imageId: string;
+  readonly images: ImageGallerySource[];
   readonly infoDescriptionStyles?: ViewStyle;
-  readonly enableTilt?: boolean;
+  readonly infoTitleStyles?: ViewStyle;
+  readonly onChange: (imageId: string) => void;
+  readonly onClose: () => void;
+  readonly theme?: any;
 }
 
 export interface ImageViewerState {
@@ -41,6 +42,22 @@ export interface ImageViewerState {
 }
 
 export class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
+  static propTypes: object = {
+    getSourceContext: PropTypes.func,
+    imageId: PropTypes.string,
+    images: PropTypes.array,
+    infoDescriptionStyles: PropTypes.object,
+    infoTitleStyles: PropTypes.object,
+    onChange: PropTypes.func,
+    onClose: PropTypes.func,
+    theme: PropTypes.object
+  };
+
+  static defaultProps: object = {
+    images: [],
+    theme: {}
+  };
+
   constructor(props: ImageViewerProps) {
     super(props);
 
@@ -296,7 +313,8 @@ export class ImageViewer extends React.Component<ImageViewerProps, ImageViewerSt
         images,
         imageId,
         infoDescriptionStyles,
-        infoTitleStyles
+        infoTitleStyles,
+        theme
       } = this.props;
       // TODO: improve this using Map
       const imageSource: ImageGallerySource = images.find(
@@ -315,7 +333,8 @@ export class ImageViewer extends React.Component<ImageViewerProps, ImageViewerSt
           infoTitle={imageSource && imageSource.title}
           infoTitleStyles={infoTitleStyles}
           infoDescription={imageSource && imageSource.description}
-          infoDescriptionStyles={infoDescriptionStyles} />
+          infoDescriptionStyles={infoDescriptionStyles}
+          theme={theme} />
       );
     }
 
@@ -428,7 +447,7 @@ export class ImageViewer extends React.Component<ImageViewerProps, ImageViewerSt
   }
 
   render(): JSX.Element {
-    const {imageId, images} = this.props;
+    const {imageId, images, theme} = this.props;
     const {
       dismissProgress,
       dismissScrollProgress,
@@ -459,7 +478,8 @@ export class ImageViewer extends React.Component<ImageViewerProps, ImageViewerSt
           <ViewerBackground
             opacityProgress={dismissScrollProgress}
             inputRange={[0, height._value, height._value * 2]}
-            outputRange={[0.02, 1, 0.02]} />
+            outputRange={[0.02, 1, 0.02]}
+            theme={theme} />
           {this.renderVerticalScrollView(scrollProps)}
         </Animated.View>
         {this.renderTransitionView()}

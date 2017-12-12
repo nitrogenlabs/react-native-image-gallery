@@ -1,6 +1,6 @@
 {
   "name": "@nlabs/react-native-image-gallery",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A React Native image gallery browser with interactive animations",
   "license": "MIT",
   "main": "index.js",
@@ -31,7 +31,7 @@
     "test": "jest",
     "watch": "tsc -w -p ./src"
   },
-  "typings": "dist/index",
+  "typings": "lib/index",
   "dependencies": {
     "react-native-vector-icons": "^4.4.2"
   },

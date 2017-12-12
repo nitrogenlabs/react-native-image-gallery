@@ -10,16 +10,17 @@ import {
   ImageGalleryMeasurements,
   ImageGallerySource
 } from './types/image';
+import {uiTheme} from './UITheme';
 
 export interface ImageGalleryProps {
-  readonly imageColor?: string;
   readonly imageHeight?: number;
   readonly imageWidth?: number;
   readonly images: ImageGallerySource[];
-  readonly onPress?: (imageId: string) => void;
-  readonly topMargin?: number;
-  readonly infoTitleStyles?: ViewStyle;
   readonly infoDescriptionStyles?: ViewStyle;
+  readonly infoTitleStyles?: ViewStyle;
+  readonly onPress?: (imageId: string) => void;
+  readonly theme?: any;
+  readonly topMargin?: number;
 }
 
 export interface ImageGalleryState {
@@ -28,18 +29,24 @@ export interface ImageGalleryState {
 }
 
 export class ImageGallery extends React.Component<ImageGalleryProps, ImageGalleryState> {
+  private componentTheme: any;
   private imageMeasurers: {[imageId: string]: () => ImageGalleryMeasurements} = {};
   private imageSizeMeasurers: {[imageId: string]: () => ImageGalleryMeasurements} = {};
 
   static propTypes: object = {
-    imageColor: PropTypes.string,
     imageHeight: PropTypes.number,
     imageWidth: PropTypes.number,
-    images: PropTypes.array.isRequired,
-    onPressImage: PropTypes.func
+    images: PropTypes.array,
+    infoDescriptionStyles: PropTypes.object,
+    infoTitleStyles: PropTypes.object,
+    onPress: PropTypes.func,
+    theme: PropTypes.object,
+    topMargin: PropTypes.number
   };
 
   static defaultProps: object = {
+    images: [],
+    theme: {},
     topMargin: 0
   };
 
@@ -56,6 +63,9 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
     this.onChangePhoto = this.onChangePhoto.bind(this);
     this.onSourceContext = this.onSourceContext.bind(this);
     this.openImageViewer = this.openImageViewer.bind(this);
+
+    // Get component theme
+    this.componentTheme = {...uiTheme, ...props.theme};
 
     // Initial state
     this.state = {
@@ -116,7 +126,8 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
             infoTitleStyles={infoTitleStyles}
             infoDescriptionStyles={infoDescriptionStyles}
             onChange={this.onChangePhoto}
-            onClose={this.closeImageViewer} />
+            onClose={this.closeImageViewer}
+            theme={this.componentTheme} />
         </Modal>
       );
     }
@@ -126,7 +137,6 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
 
   render(): JSX.Element {
     const {
-      imageColor,
       imageHeight,
       imageWidth,
       images,
@@ -138,13 +148,13 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
       <SafeAreaView style={styles.container}>
         <ImageListContainer
           activeId={imageId}
-          imageColor={imageColor}
           imageHeight={imageHeight}
           imageWidth={imageWidth}
           images={images}
           onPress={this.openImageViewer}
           showImageViewer={showImageViewer}
-          topMargin={topMargin} />
+          topMargin={topMargin}
+          theme={this.componentTheme} />
         {this.renderModal()}
       </SafeAreaView>
     );

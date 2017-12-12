@@ -86,63 +86,31 @@ export class ImageTransitionView extends React.PureComponent<Props> {
 
     const translateY = dismissScrollProgress
       ? Animated.add(
-        transitionProgress.interpolate({
-          inputRange: TRANSITION_RANGE,
-          outputRange: [startTranslateY, 0]
-        }),
+        transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [startTranslateY, 0]}),
         Animated.multiply(
-          dismissScrollProgress.interpolate({
-            inputRange: [0, height, height * 2],
-            outputRange: [300, 0, -300]
-          }),
+          dismissScrollProgress.interpolate({inputRange: [0, height, height * 2], outputRange: [300, 0, -300]}),
           dismissScrollProgress.interpolate({
             inputRange: [0, height * 0.5, height, height * 1.5, height * 2],
             outputRange: [0, 1, 1, 1, 0]
           })
         )
       )
-      : transitionProgress.interpolate({
-        inputRange: TRANSITION_RANGE,
-        outputRange: [startTranslateY, 0]
-      });
+      : transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [startTranslateY, 0]});
 
     const containerStyle = {
       backgroundColor: 'transparent',
       height: openImageMeasurements.height,
       left: openImageMeasurements.x,
-      opacity: transitionProgress.interpolate({
-        inputRange: OPACITY_RANGE,
-        outputRange: [0, 1, 1, 0]
-      }),
+      opacity: transitionProgress.interpolate({inputRange: OPACITY_RANGE, outputRange: [0, 1, 1, 0]}),
       overflow: 'hidden',
       position: 'absolute',
       top: openImageMeasurements.y,
       transform: [
-        {
-          translateX: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [startTranslateX, 0]
-          })
-        },
+        {translateX: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [startTranslateX, 0]})},
         {translateY},
-        {
-          scale: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [startScale, 1]
-          })
-        },
-        {
-          scaleX: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [inlineAspectX, 1]
-          })
-        },
-        {
-          scaleY: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [inlineAspectY, 1]
-          })
-        }
+        {scale: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [startScale, 1]})},
+        {scaleX: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [inlineAspectX, 1]})},
+        {scaleY: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [inlineAspectY, 1]})}
       ],
       width: openImageMeasurements.width
     };
@@ -151,25 +119,13 @@ export class ImageTransitionView extends React.PureComponent<Props> {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: 'transparent',
       transform: [
-        {
-          scaleX: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [1 / inlineAspectX, 1]
-          })
-        },
-        {
-          scaleY: transitionProgress.interpolate({
-            inputRange: TRANSITION_RANGE,
-            outputRange: [1 / inlineAspectY, 1]
-          })
-        }
+        {scaleX: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [1 / inlineAspectX, 1]})},
+        {scaleY: transitionProgress.interpolate({inputRange: TRANSITION_RANGE, outputRange: [1 / inlineAspectY, 1]})}
       ]
     };
 
     return (
-      <Animated.View
-        pointerEvents="none"
-        style={containerStyle}>
+      <Animated.View pointerEvents="none" style={containerStyle}>
         <Animated.Image source={source} style={imageStyle} />
       </Animated.View>
     );

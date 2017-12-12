@@ -1,3 +1,4 @@
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import {
   Animated,
@@ -6,6 +7,7 @@ import {
   Platform,
   StatusBar,
   StyleSheet,
+  TextStyle,
   TouchableWithoutFeedback,
   ViewStyle
 } from 'react-native';
@@ -23,6 +25,7 @@ export interface ImagePanerProps {
   readonly infoView?: React.Component;
   readonly onPress: () => void;
   readonly source: ImageURISource;
+  readonly theme: any;
   readonly transition: Animated.Value;
   readonly zoomedImageMeasurements: ImageGalleryMeasurements;
 }
@@ -32,9 +35,25 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
   private buttonOpacity = new Animated.Value(0);
   private x = new Animated.Value(0);
 
+  static propTypes: object = {
+    imageHeight: PropTypes.number,
+    imageWidth: PropTypes.number,
+    infoDescription: PropTypes.string,
+    infoDescriptionStyles: PropTypes.object,
+    infoTitle: PropTypes.string,
+    infoTitleStyles: PropTypes.object,
+    infoView: PropTypes.node,
+    onPress: PropTypes.func,
+    source: PropTypes.object,
+    theme: PropTypes.object,
+    transition: PropTypes.object,
+    zoomedImageMeasurements: PropTypes.object
+  };
+
   static defaultProps: object = {
     imageHeight: 750, // Arbitrary value
-    imageWidth: 1129 // Arbitrary value
+    imageWidth: 1129, // Arbitrary value,
+    theme: {}
   };
 
   constructor(props: ImagePanerProps) {
@@ -73,11 +92,7 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
       this.scroll = ref.getNode();
 
       if(Platform.OS === 'ios') {
-        this.scroll.scrollTo({
-          animated: false,
-          x: -this.props.zoomedImageMeasurements.x,
-          y: 0
-        });
+        this.scroll.scrollTo({animated: false, x: -this.props.zoomedImageMeasurements.x, y: 0});
       }
     }
   }
@@ -89,7 +104,8 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
       infoTitle,
       infoTitleStyles,
       infoView,
-      onPress
+      onPress,
+      theme
     } = this.props;
 
     if(infoView) {
@@ -97,26 +113,52 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
       return <Animated.View style={{opacity: this.buttonOpacity}}>{infoView}</Animated.View>;
     }
 
+    const {
+      imageGalleryCloseSize = 50,
+      imageGalleryTextColor = '#fff',
+      imageGalleryTextSize = 11
+    } = theme;
+    const themeIconStyle: TextStyle[] = [
+      viewStyles.closeIcon,
+      viewStyles.textShadow,
+      {color: imageGalleryTextColor, fontSize: imageGalleryCloseSize}
+    ];
+
     if(infoTitle) {
-      const smallCloseStyle = [viewStyles.closeIcon, viewStyles.textShadow, infoTitleStyles];
+      const {width} = Dimensions.get('window');
+      const textContainerStyle = {
+        width: width - imageGalleryCloseSize
+      };
+      const themeTitleStyle: TextStyle[] = [
+        viewStyles.titleText,
+        viewStyles.textShadow,
+        {color: imageGalleryTextColor, fontSize: imageGalleryTextSize},
+        infoTitleStyles
+      ];
+      const themeDescStyle: TextStyle[] = [
+        viewStyles.descText,
+        viewStyles.textShadow,
+        {color: imageGalleryTextColor, fontSize: imageGalleryTextSize},
+        infoDescriptionStyles
+      ];
 
       return (
-        <Animated.View style={[viewStyles.infoTextContainer, {opacity: this.buttonOpacity}]}>
+        <Animated.View style={[textContainerStyle, {opacity: this.buttonOpacity}]}>
           <Animated.View style={viewStyles.textContainer}>
             <Animated.Text
-              style={[viewStyles.titleText, viewStyles.textShadow, infoTitleStyles]}
+              style={themeTitleStyle}
               numberOfLines={1}>
               {infoTitle.toUpperCase()}
             </Animated.Text>
             <Animated.Text
-              style={[viewStyles.descText, viewStyles.textShadow, infoDescriptionStyles]}
+              style={themeDescStyle}
               numberOfLines={0}>
               {infoDescription}
             </Animated.Text>
           </Animated.View>
           <TouchableWithoutFeedback onPress={onPress}>
             <Animated.View style={[viewStyles.closeTextContainer, {opacity: this.buttonOpacity}]}>
-              <Ionicons name="ios-close-circle-outline" style={[viewStyles.textShadow, smallCloseStyle]} />
+              <Ionicons name="ios-close-circle-outline" style={themeIconStyle} />
             </Animated.View>
           </TouchableWithoutFeedback>
         </Animated.View>
@@ -125,7 +167,7 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
       return (
         <TouchableWithoutFeedback onPress={onPress}>
           <Animated.View style={[viewStyles.closeContainer, {opacity: this.buttonOpacity}]}>
-            <Ionicons name="ios-close-circle-outline" style={[viewStyles.textShadow, viewStyles.closeIcon]} />
+            <Ionicons name="ios-close-circle-outline" style={themeIconStyle} />
           </Animated.View>
         </TouchableWithoutFeedback>
       );
@@ -133,10 +175,14 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
   }
 
   render(): JSX.Element {
-    const {source, transition, zoomedImageMeasurements} = this.props;
+    const {source, theme, transition, zoomedImageMeasurements} = this.props;
     const {height, width} = Dimensions.get('window');
+    const {
+      imageGalleryBgColor = '#000',
+      statusBarTheme = 'light-content'
+    } = theme;
     const containerStyle = {
-      backgroundColor: '#000',
+      backgroundColor: imageGalleryBgColor,
       height,
       opacity: transition.interpolate({inputRange: [0.998, 1], outputRange: [0, 1]}),
       width
@@ -147,19 +193,15 @@ export class ImagePaner extends React.PureComponent<ImagePanerProps> {
       transform: [{translateX: new Animated.Value(0)}],
       width: zoomedImageMeasurements.width
     };
+    const scrollStyle = {
+      backgroundColor: imageGalleryBgColor
+    };
 
     return (
       <Animated.View style={containerStyle}>
-        <StatusBar animated={true} hidden={true} barStyle="light-content" />
-        <Animated.ScrollView
-          ref={this.handleRef}
-          horizontal={true}
-          bounces={true}
-          style={viewStyles.scrollView}>
-          <Animated.Image
-            source={source}
-            onLoad={this.onLoad}
-            style={imageStyle} />
+        <StatusBar animated={true} hidden={true} barStyle={statusBarTheme} />
+        <Animated.ScrollView ref={this.handleRef} horizontal={true} bounces={true} style={scrollStyle}>
+          <Animated.Image source={source} onLoad={this.onLoad} style={imageStyle} />
         </Animated.ScrollView>
         {this.renderInfoView()}
       </Animated.View>
@@ -179,8 +221,6 @@ const viewStyles = StyleSheet.create({
     right: 0
   },
   closeIcon: {
-    color: '#fff',
-    fontSize: 50,
     padding: 5,
     textAlign: 'center'
   },
@@ -190,9 +230,7 @@ const viewStyles = StyleSheet.create({
     flexDirection: 'row'
   },
   descText: {
-    backgroundColor: 'transparent',
-    color: '#fff',
-    fontSize: 11
+    backgroundColor: 'transparent'
   },
   infoTextContainer: {
     alignItems: 'center',
@@ -201,11 +239,7 @@ const viewStyles = StyleSheet.create({
     justifyContent: 'center',
     left: 25,
     minHeight: 60,
-    position: 'absolute',
-    width: Dimensions.get('window').width - 50
-  },
-  scrollView: {
-    backgroundColor: '#000'
+    position: 'absolute'
   },
   textContainer: {
     flex: 1
@@ -217,8 +251,6 @@ const viewStyles = StyleSheet.create({
   },
   titleText: {
     backgroundColor: 'transparent',
-    color: '#fff',
-    fontSize: 11,
     fontWeight: '500'
   }
 });

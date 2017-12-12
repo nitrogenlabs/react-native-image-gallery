@@ -1,8 +1,4 @@
-import {Dimensions, Platform} from 'react-native';
 import {ImageGalleryMeasurements, ImageGallerySize} from './types/image';
-
-const X_WIDTH: number = 375;
-const X_HEIGHT: number = 812;
 
 export class Utils {
   static getImageMeasurements(sizes: ImageGallerySize): ImageGalleryMeasurements {
@@ -47,15 +43,5 @@ export class Utils {
       x,
       y
     };
-  }
-
-  static isIPhoneX(): boolean {
-    return (
-      Platform.OS === 'ios' &&
-      ((Dimensions.get('window').height === X_HEIGHT &&
-        Dimensions.get('window').width === X_WIDTH) ||
-        (Dimensions.get('window').height === X_WIDTH &&
-          Dimensions.get('window').width === X_HEIGHT))
-    );
   }
 }
