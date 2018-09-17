@@ -21,6 +21,12 @@ export interface ImageGalleryProps {
   readonly onPress?: (imageId: string) => void;
   readonly theme?: any;
   readonly topMargin?: number;
+  readonly selectable: boolean;
+  readonly onCheckImage: (imageId: string) => void;
+  readonly onUncheckImage: (imageId: string) => void;
+  readonly onStartSelectMode?: () => void;
+  readonly selectMode?: boolean;
+  readonly selectedImages?: object;
 }
 
 export interface ImageGalleryState {
@@ -41,13 +47,22 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
     infoTitleStyles: PropTypes.object,
     onPress: PropTypes.func,
     theme: PropTypes.object,
-    topMargin: PropTypes.number
+    topMargin: PropTypes.number,
+    selectable: PropTypes.bool,
+    onCheckImage: PropTypes.func,
+    onUncheckImage: PropTypes.func,
+    onStartSelectMode: PropTypes.func,
+    selectMode: PropTypes.bool,
+    selectedImages: PropTypes.object,
   };
 
   static defaultProps: object = {
     images: [],
     theme: {},
-    topMargin: 0
+    topMargin: 0,
+    selectable: false,
+    selectMode: false,
+    selectedImages: {}
   };
 
   static childContextTypes: object = {
@@ -140,10 +155,15 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
       imageHeight,
       imageWidth,
       images,
-      topMargin = 0
+      topMargin = 0,
+      selectable,
+      selectMode,
+      onStartSelectMode,
+      onCheckImage,
+      onUncheckImage,
+      selectedImages
     } = this.props;
     const {imageId, showImageViewer} = this.state;
-
     return (
       <SafeAreaView style={styles.container}>
         <ImageListContainer
@@ -154,7 +174,13 @@ export class ImageGallery extends React.Component<ImageGalleryProps, ImageGaller
           onPress={this.openImageViewer}
           showImageViewer={showImageViewer}
           topMargin={topMargin}
-          theme={this.componentTheme} />
+          theme={this.componentTheme}
+          selectable={selectable}
+          onCheckImage={onCheckImage}
+          onUncheckImage={onUncheckImage}
+          selectMode={selectMode}
+          onStartSelectMode={onStartSelectMode}
+          selectedItems={selectedImages} />
         {this.renderModal()}
       </SafeAreaView>
     );

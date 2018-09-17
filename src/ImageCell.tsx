@@ -1,6 +1,6 @@
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import {Animated, Dimensions, Easing, Image, ImageURISource, TouchableOpacity} from 'react-native';
+import {Animated, Dimensions, Easing, Image, ImageURISource, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 const windowWidth: number = Dimensions.get('window').width * 0.5;
 
@@ -13,6 +13,12 @@ export interface ImageCellProps {
   readonly shouldHideDisplayedImage: boolean;
   readonly theme?: any;
   readonly topMargin: number;
+  readonly selectable?: boolean;
+  readonly onCheckImage?: (imageId: string) => void;
+  readonly onUncheckImage?: (imageId: string) => void;
+  readonly selectMode?: boolean;
+  readonly onStartSelectMode?: () => void;
+  readonly selected: boolean;
 }
 
 export interface ImageCellState {
@@ -32,13 +38,22 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
     shouldHideDisplayedImage: PropTypes.bool.isRequired,
     source: PropTypes.any.isRequired,
     theme: PropTypes.object,
-    topMargin: PropTypes.number.isRequired
+    topMargin: PropTypes.number.isRequired,
+    selectable: PropTypes.bool,
+    onCheckImage: PropTypes.func,
+    onUncheckImage: PropTypes.func,
+    selectMode: PropTypes.bool,
+    onStartSelectMode: PropTypes.func,
+    selected: PropTypes.bool,
   };
 
   static defaultProps: object = {
     imageHeight: windowWidth,
     imageWidth: windowWidth,
-    theme: {}
+    theme: {},
+    selectMode: false,
+    selectable: false,
+    selected: false,
   };
 
   static contextTypes = {
@@ -52,11 +67,12 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
     this.measureImageSize = this.measureImageSize.bind(this);
     this.measurePhoto = this.measurePhoto.bind(this);
     this.onPress = this.onPress.bind(this);
+    this.onLongPress = this.onLongPress.bind(this);
 
     // Initial state
     this.state = {
       imageLoaded: false,
-      opacity: new Animated.Value(1)
+      opacity: new Animated.Value(1),
     };
   }
 
@@ -69,10 +85,12 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
   }
 
   shouldComponentUpdate(nextProps: ImageCellProps, nextState: ImageCellState): boolean {
-    const {shouldHideDisplayedImage} = this.props;
+    const {shouldHideDisplayedImage, selected} = this.props;
     const {imageLoaded} = this.state;
 
-    if(shouldHideDisplayedImage !== nextProps.shouldHideDisplayedImage || imageLoaded !== nextState.imageLoaded) {
+    if(shouldHideDisplayedImage !== nextProps.shouldHideDisplayedImage 
+      || imageLoaded !== nextState.imageLoaded
+      || selected !== nextProps.selected) {
       return true;
     }
 
@@ -145,13 +163,51 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
   }
 
   onPress(): void {
-    const {imageId, onPress} = this.props;
+    const {imageId, onPress, selectable, selectMode} = this.props;
     const {imageLoaded} = this.state;
 
-    // Wait for the image to load before reacting to press events
-    if(imageLoaded && onPress) {
-      onPress(imageId);
+    if(selectable && selectMode){
+      this.toggleImageSelection();
+    }else{
+      // Wait for the image to load before reacting to press events
+      if(imageLoaded && onPress) {
+        onPress(imageId);
+      }
     }
+  }
+  
+  selectImage(imagePath: string): void {
+    const {onCheckImage} = this.props;
+    if(onCheckImage){
+      onCheckImage(imagePath);
+    }
+  }
+
+  uncheckImage(imagePath: string): void {
+    const {onUncheckImage} = this.props;
+    if(onUncheckImage){
+      onUncheckImage(imagePath);
+    }
+  }
+
+  onLongPress(): void{
+    const {selectable, selectMode, onStartSelectMode} = this.props;
+    if(selectable){
+      if(!selectMode){
+        onStartSelectMode();
+      }
+      this.toggleImageSelection();
+    }
+  }
+
+  toggleImageSelection(): void{
+    const {imageId, selected} = this.props;
+    if(selected){
+      this.uncheckImage(imageId)
+    }else{
+      this.selectImage(imageId);
+    }
+    this.setState( Object.assign({}, this.state, {selected: !selected}) );
   }
 
   render(): JSX.Element {
@@ -160,7 +216,10 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
       imageId,
       imageWidth,
       source,
-      theme
+      theme,
+      selectable,
+      selectMode,
+      selected,
     } = this.props;
     const {imageGalleryImageColor = '#f1f1f1'} = theme;
     const imageStyle = {
@@ -169,12 +228,17 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
       opacity: this.state.opacity,
       width: imageWidth
     };
+    const selectedImageStyle = {
+      height: imageHeight/5,
+      width: imageWidth/5
+    };
 
     return (
       <TouchableOpacity
         key={imageId}
         style={{backgroundColor: imageGalleryImageColor}}
-        onPress={this.onPress}>
+        onPress={this.onPress}
+        onLongPress={this.onLongPress}>
         <Animated.Image
           onLayout={() => this.readyToMeasure = true}
           onLoad={() => this.setState({imageLoaded: true})}
@@ -182,7 +246,30 @@ export class ImageCell extends React.Component<ImageCellProps, ImageCellState> {
           source={source}
           resizeMode="cover"
           style={imageStyle} />
+        <View style={ selectable && selected && selectMode ? styles.overlay : styles.hidden } >
+          <Image 
+            source={require('../assets/tick.png')}
+            style={selectedImageStyle}
+          />
+        </View>
       </TouchableOpacity>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(69,85,117,0.7)',
+  },
+  absoluteFillObject: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0
+  },
+  hidden: {
+    display: 'none'
+  }
+});
