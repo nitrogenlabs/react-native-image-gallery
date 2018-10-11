@@ -14,6 +14,12 @@ export interface ImageListContainerProps {
   readonly showImageViewer?: boolean;
   readonly theme?: object;
   readonly topMargin?: number;
+  readonly onCheckImage: (imageId: string) => void;
+  readonly onUncheckImage: (imageId: string) => void;
+  readonly selectable?: boolean;
+  readonly selectMode?: boolean;
+  readonly onStartSelectMode?: () => void;
+  readonly selectedItems?: object;
 }
 
 export class ImageListContainer extends React.PureComponent<ImageListContainerProps> {
@@ -30,14 +36,23 @@ export class ImageListContainer extends React.PureComponent<ImageListContainerPr
     onPress: PropTypes.func.isRequired,
     showImageViewer: PropTypes.bool,
     theme: PropTypes.object,
-    topMargin: PropTypes.number
+    topMargin: PropTypes.number,
+    onCheckImage: PropTypes.func,
+    onUncheckImage: PropTypes.func,
+    selectable: PropTypes.bool,
+    selectMode: PropTypes.bool,
+    onStartSelectMode: PropTypes.func,
+    selectedItems: PropTypes.object
   };
 
   static defaultProps: object = {
     images: [],
     showImageViewer: false,
     theme: {},
-    topMargin: 0
+    topMargin: 0,
+    selectable: false,
+    selectMode: false,
+    selectedItems: {},
   };
 
   constructor(props: ImageListContainerProps) {
@@ -55,9 +70,14 @@ export class ImageListContainer extends React.PureComponent<ImageListContainerPr
       onPress,
       showImageViewer,
       theme,
-      topMargin
+      topMargin,
+      selectable, 
+      onCheckImage,
+      onUncheckImage,
+      selectMode,
+      onStartSelectMode,
+      selectedItems
     } = this.props;
-
     return (
       <ImageCell
         key={`ImageCellId-${item.item.id}`}
@@ -68,21 +88,29 @@ export class ImageListContainer extends React.PureComponent<ImageListContainerPr
         onPress={onPress}
         shouldHideDisplayedImage={showImageViewer && activeId === item.item.id}
         theme={theme}
-        topMargin={topMargin} />
+        topMargin={topMargin}
+        selectable={selectable}
+        onCheckImage={onCheckImage}
+        onUncheckImage={onUncheckImage}
+        selectMode={selectMode}
+        onStartSelectMode={onStartSelectMode}
+        selected={selectedItems[item.item.id] === true}/>
     );
   }
 
   render(): JSX.Element {
     const {
       activeId,
-      images
+      images,
+      selectMode,
+      selectedItems
     } = this.props;
-
+    
     return (
       <FlatList
         style={styles.container}
         data={images}
-        extraData={activeId}
+        extraData={[activeId, selectMode, selectedItems]}
         numColumns={2}
         keyExtractor={(item: ImageGallerySource) => item.id}
         renderItem={this.renderItem}
